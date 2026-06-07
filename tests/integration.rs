@@ -14,7 +14,10 @@ fn strips_bold_italic() {
 
 #[test]
 fn strips_inline_code() {
-    assert_eq!(strip_markdown("use `cargo build` to build"), "use cargo build to build");
+    assert_eq!(
+        strip_markdown("use `cargo build` to build"),
+        "use cargo build to build"
+    );
 }
 
 #[test]
@@ -76,4 +79,21 @@ fn complex_paragraph() {
         strip_markdown(md),
         "Hello\n\nbold and italic with code and a link."
     );
+}
+
+#[test]
+fn preserves_non_ascii_text() {
+    // Regression test: plain (non-token) UTF-8 must not be corrupted.
+    let md = "## Über café\n\nnaïve — 日本語 with 🎉";
+    assert_eq!(strip_markdown(md), "Über café\n\nnaïve — 日本語 with 🎉");
+}
+
+#[test]
+fn preserves_trailing_newline() {
+    assert_eq!(strip_markdown("# Title\n"), "Title\n");
+}
+
+#[test]
+fn empty_string_round_trips() {
+    assert_eq!(strip_markdown(""), "");
 }
